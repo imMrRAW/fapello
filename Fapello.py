@@ -41,25 +41,36 @@ def download_media(file_url, folder_path, is_video=False):
         return False
     return False
 
-def download_all_media(urls, folder_path):
+def download_all_media(urls, downloads_path):
     video_download_count = 0  # Räknare för antal nedladdade videor
     failed_video_count = 0  # Räknare för antal misslyckade videor
     
     for url in urls:
-        is_video = url.endswith(".mp4")
-        if is_video:
-            success = download_media(url, folder_path, is_video=is_video)
-            if success:
-                video_download_count += 1
-            else:
-                failed_video_count += 1
-                if failed_video_count >= 50:
-                    print("50 misslyckade nedladdningar har nåtts. Går vidare till nästa URL.")
-                    return video_download_count
-        else:
-            download_media(url, folder_path, is_video=is_video)
+        username = extract_username(url)
+        folder_path = create_directory(downloads_path, username)
+        base_url = f"https://fapello.com/content/{username[0]}/{username[1]}/{username}/1000/{username}"
+        
+        # Ladda ner bilder och videor parallellt
+        image_urls = [get_image_url(base_url, i) for i in range(1, 1000)]
+        video_urls = [get_video_url(base_url, i) for i in range(1, 1000)]
+        
+        for media_url in image_urls + video_urls:
+            is_video = media_url.endswith(".mp4")
+            download_media(media_url, folder_path, is_video=is_video)
     
     return video_download_count
+
+def extract_username(url):
+    if url.startswith("http://"):
+        url = url[len("http://"):]
+    elif url.startswith("https://"):
+        url = url[len("https://"):]
+    if url.startswith("www."):
+        url = url[len("www."):]
+    if url.endswith("/"):
+        url = url[:-1]
+    parts = url.split('/')
+    return parts[-1]
 
 def main():
     current_dir = os.path.dirname(os.path.abspath(__file__))
@@ -72,32 +83,7 @@ def main():
     downloads_path = os.path.join(current_dir, "Downloads")
     
     for url in urls:
-        if not url.startswith("https://fapello.com/"):
-            print(f"Fel: '{url}' är inte en giltig URL till en undersida på fapello.com.")
-            continue
-        
-        username = url.split('/')[-2]
-        folder_path = create_directory(downloads_path, username)
-        base_url = f"https://fapello.com/content/{username[0]}/{username[1]}/{username}/1000/{username}"
-        
-        # Ladda ner bilder och videor parallellt
-        image_urls = [get_image_url(base_url, i) for i in range(1, 1000)]
-        video_urls = [get_video_url(base_url, i) for i in range(1, 1000)]
-        
-        image_thread = threading.Thread(target=download_all_media, args=(image_urls, folder_path))
-        video_thread = threading.Thread(target=download_all_media, args=(video_urls, folder_path))
-        
-        image_thread.start()
-        
-        # Starta video-nedladdning efter att ha väntat i 2 sekunder
-        # för att se till att texten "Laddar ned" har skrivits ut
-        # innan progressbaren för videon visas.
-        time.sleep(2)
-        video_thread.start()
-        
-        # Avsluta med att vänta på att alla trådar ska slutföras
-        image_thread.join()
-        video_thread.join()
+        download_all_media([url], downloads_path)
 
 if __name__ == "__main__":
     main()
