@@ -24,6 +24,8 @@ def download_media(file_url, folder_path, is_video=False):
     
     if is_video:
         print(f"Laddar ned: {filename}")
+    else:
+        print(f"Hämtar bild: {filename}")
     
     response = requests.get(file_url, stream=True)
     if response.status_code == 200:
@@ -34,31 +36,49 @@ def download_media(file_url, folder_path, is_video=False):
             for chunk in response.iter_content(chunk_size=8192):
                 f.write(chunk)
                 pbar.update(len(chunk))
-        print(f"Fil nedladdad: {filename}")
+        if is_video:
+            print(f"Fil nedladdad: {filename}")
+        else:
+            print(f"Bild hämtad: {filename}")
         return True
     elif is_video and response.status_code == 404:
         print(f"404 Not Found: {filename}")
         return False
     return False
 
-def download_all_media(urls, downloads_path):
-    video_download_count = 0  # Räknare för antal nedladdade videor
+def download_images(image_urls, folder_path):
+    for image_url in image_urls:
+        if download_media(image_url, folder_path, is_video=False):
+            continue
+        else:
+            break
+
+def download_videos(video_urls, folder_path):
     failed_video_count = 0  # Räknare för antal misslyckade videor
-    
+    for video_url in video_urls:
+        if download_media(video_url, folder_path, is_video=True):
+            continue
+        else:
+            failed_video_count += 1
+            if failed_video_count >= 50:
+                print("50 misslyckade nedladdningar har nåtts. Avbryter nedladdning av videor.")
+                break
+
+def download_all_media(urls, downloads_path):
     for url in urls:
         username = extract_username(url)
         folder_path = create_directory(downloads_path, username)
         base_url = f"https://fapello.com/content/{username[0]}/{username[1]}/{username}/1000/{username}"
         
-        # Ladda ner bilder och videor parallellt
+        # Hämta bild- och video-URL:er
         image_urls = [get_image_url(base_url, i) for i in range(1, 1000)]
         video_urls = [get_video_url(base_url, i) for i in range(1, 1000)]
         
-        for media_url in image_urls + video_urls:
-            is_video = media_url.endswith(".mp4")
-            download_media(media_url, folder_path, is_video=is_video)
-    
-    return video_download_count
+        # Hämta bilder först
+        download_images(image_urls, folder_path)
+        
+        # Sedan hämta videor
+        download_videos(video_urls, folder_path)
 
 def extract_username(url):
     if url.startswith("http://"):
@@ -81,9 +101,7 @@ def main():
         urls = file.read().splitlines()
 
     downloads_path = os.path.join(current_dir, "Downloads")
-    
-    for url in urls:
-        download_all_media([url], downloads_path)
+    download_all_media(urls, downloads_path)
 
 if __name__ == "__main__":
     main()
