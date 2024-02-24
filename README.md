@@ -1,26 +1,26 @@
 # Fapello Downloader
 
-## Beskrivning
-Det här Python-skriptet är utformat för att ladda ner bilder och videor från användares sidor på fapello.com. Skriptet läser in en lista med URL:er från en fil `urls.txt` och laddar ner alla tillgängliga bilder och upp till 50 videor från varje användares sida.
+## Description
+This Python script is designed to download images and videos from user pages on fapello.com. The script reads a list of URLs from a file `urls.txt` and downloads all available images and up to 50 videos from each user's page.
 
-## Användning
-1. Lägg till önskade URL:er till användarsidor på fapello.com i filen `urls.txt`, en URL per rad.
-2. Kör `Fapello.py`.
-3. Skriptet skapar en mapp för varje användare och laddar ner bilderna och upp till 50 videor till respektive mapp.
+## Usage
+1. Add desired URLs to user pages on fapello.com in the file `urls.txt`, one URL per line.
+2. Run `Fapello.py`.
+3. The script creates a folder for each user and downloads the images and up to 50 videos to their respective folders.
 
-## Förutsättningar
+## Prerequisites
 - Python 3.x
-- Bibliotek: requests, tqdm
+- Libraries: requests, tqdm
 
-## Installation av beroenden
+## Installation of Dependencies
 ```
 pip install -r requirements.txt
 ```
 
-## Konfiguration
-Ingen konfiguration krävs. Se till att ha en fil `urls.txt` med önskade URL:er till användarsidor på fapello.com.
+## Configuration
+No configuration is required. Make sure to have a file `urls.txt` with desired URLs to user pages on fapello.com.
 
-## Struktur
+## Structure
 ```
 .
 ├── main.py
@@ -30,14 +30,14 @@ Ingen konfiguration krävs. Se till att ha en fil `urls.txt` med önskade URL:er
 └── Downloads/
 ```
 
-- `Fapello.py`: Huvudskriptet för nedladdning av bilder och videor.
-- `README.md`: Den här filen, innehåller beskrivning och instruktioner för projektet.
-- `requirements.txt`: Lista över Python-bibliotek som krävs.
-- `urls.txt`: Filen med URL:er till användarsidor på fapello.com.
-- `Downloads/`: Mappen där nedladdade bilder och videor sparas.
+- `Fapello.py`: The main script for downloading images and videos.
+- `README.md`: This file, containing description and instructions for the project.
+- `requirements.txt`: List of required Python libraries.
+- `urls.txt`: The file with URLs to user pages on fapello.com.
+- `Downloads/`: The folder where downloaded images and videos are saved.
 
-## Bidrag
-Bidrag är välkomna! Öppna gärna en issue för att diskutera större ändringar eller skapa en pull request direkt om du har mindre ändringar att föreslå.
+## Contributions
+Contributions are welcome! Feel free to open an issue to discuss major changes or create a pull request directly if you have minor changes to suggest.
 
-## Licens
-Det här projektet är licensierat under [MIT licensen](LICENSE).
+## License
+This project is licensed under the [MIT License](LICENSE).
